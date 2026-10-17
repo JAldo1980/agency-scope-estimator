@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Pick agency scope, set rates and buffers, and get a fixed price with margin and a copy-ready client summary.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2710%27 fill=%27%23141C26%27/%3E%3Ctext x=%2732%27 y=%2742%27 text-anchor=%27middle%27 font-family=%27monospace%27 font-size=%2730%27 fill=%27%23fff%27%3E%C2%A3%3C/text%3E%3C/svg%3E">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Agency Scope Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;500;700&display=swap">
+<style>
+/* Accessibility: Atkinson Hyperlegible (Braille Institute) for every letter and figure;
+   all text colours meet WCAG AA (most AAA) on their backgrounds; form-field borders and
+   status markers meet the 3:1 non-text rule; meaning is always carried by words as well as colour.
+   Layout: a calm SaaS wizard. A five-step progress tracker across the top, one step's card
+   at a time on the left, and a live estimate card pinned on the right. White cards on a
+   soft blue-grey ground, one confident blue for actions and selection, rounded and airy. */
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --sunk:#F7F8FA; --ink:#0F172A; --muted:#4A5568; --line:#E2E6EC; --line-2:#C5CCD8; --field:#6B7280;
+  --accent:#0B5CD5; --accent-ink:#FFFFFF; --accent-soft:#E8F0FD; --accent-line:#9DBBF0;
+  --good:#0B6B3A; --good-soft:#E3F4EA; --warn:#8A4B00; --warn-soft:#FDF0DB; --bad:#B42318; --bad-soft:#FDE8E6;
+  --f-strat:#0B5CD5; --f-design:#C2410C; --f-eng:#047857; --f-mkt:#9D3E8A;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.06);
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --surface:#161B26; --sunk:#11161F; --ink:#F1F5F9; --muted:#B4BFCF; --line:#283142; --line-2:#3A4558; --field:#8B97AA;
+  --accent:#8AB4FF; --accent-ink:#0B1530; --accent-soft:#1A2B4A; --accent-line:#4A6CB0;
+  --good:#6EE7A8; --good-soft:#0F2E20; --warn:#FBC15E; --warn-soft:#36270B; --bad:#FF9B8A; --bad-soft:#3A1712;
+  --f-strat:#8AB4FF; --f-design:#FF9E66; --f-eng:#4FD1A5; --f-mkt:#E59AD6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --surface:#161B26; --sunk:#11161F; --ink:#F1F5F9; --muted:#B4BFCF; --line:#283142; --line-2:#3A4558; --field:#8B97AA;
+  --accent:#8AB4FF; --accent-ink:#0B1530; --accent-soft:#1A2B4A; --accent-line:#4A6CB0;
+  --good:#6EE7A8; --good-soft:#0F2E20; --warn:#FBC15E; --warn-soft:#36270B; --bad:#FF9B8A; --bad-soft:#3A1712;
+  --f-strat:#8AB4FF; --f-design:#FF9E66; --f-eng:#4FD1A5; --f-mkt:#E59AD6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding-inline:16px;padding-block:0 96px;}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:13px;color:var(--muted);font-weight:700}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted)}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding-block:28px 8px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:18px}
+.top h1{font-size:22px}
+.top p{margin:0;color:var(--muted);font-size:14px}
+
+/* Stepper */
+.stepper{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 20px 14px;margin-top:16px;overflow-x:auto}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(96px,1fr));list-style:none;margin:0;padding:0;min-width:520px}
+.steps li{position:relative}
+.steps button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:10px;width:100%;text-align:center;font-size:13.5px;font-weight:700;color:var(--muted);border-radius:8px}
+.steps button:focus-visible{outline:3px solid var(--accent)}
+.steps .dot{position:relative;z-index:1;width:16px;height:16px;border-radius:50%;background:var(--surface);border:2px solid var(--field)}
+.steps li::before{content:"";position:absolute;bottom:6px;left:-50%;right:50%;height:2px;background:var(--line-2)}
+.steps li:first-child::before{display:none}
+.steps li.done::before,.steps li.current::before{background:var(--accent)}
+.steps li.done .dot{background:var(--accent);border-color:var(--accent)}
+.steps li.current .dot{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.steps li.current button,.steps li.done button{color:var(--ink)}
+.steps li.current button{color:var(--accent)}
+
+/* Main grid */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;padding-top:20px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Cards */
+.card,.panel,.group,.budget{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.step-head{text-align:center;padding:8px 8px 20px}
+.step-head h2{font-size:clamp(22px,2.6vw,28px)}
+.step-head p{margin:6px auto 0;color:var(--muted);max-width:56ch}
+.panel{padding:22px;margin-bottom:16px}
+.panel h3{font-size:17px;margin-bottom:4px}
+.panel > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap}
+
+/* Fields */
+.field{display:grid;gap:6px;min-width:0}
+.field input,.field select,.rates input,.rates select{width:100%;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-sm);padding:10px 12px;min-height:44px}
+.field input:hover,.field select:hover{border-color:var(--muted)}
+.field input:focus,.field select:focus,.rates input:focus,.rates select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ref{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.ref{grid-template-columns:minmax(0,1fr)}}
+
+/* Engagement type cards */
+.types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.types{grid-template-columns:minmax(0,1fr)}}
+.type{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:24px 18px 20px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--surface);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.type:hover{border-color:var(--accent-line)}
+.type:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.type:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.type svg{width:48px;height:48px;color:var(--ink)}
+.type strong{font-size:16px}
+.type span{color:var(--muted);font-size:13.5px;max-width:26ch;margin-bottom:8px}
+.type input{appearance:none;flex:none;width:22px;height:22px;margin:auto 0 0;border:2px solid var(--field);border-radius:50%;display:grid;place-items:center}
+.type input:checked{border-color:var(--accent)}
+.type input:checked::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 20px;border-radius:999px;border:1px solid var(--field);background:var(--surface);cursor:pointer;font-weight:700;text-decoration:none;text-align:center;font-size:14.5px}
+.btn:hover{border-color:var(--ink)}
+a.btn{color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);padding-inline:28px;min-width:200px}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.go{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:transparent}
+.linkbtn{background:none;border:0;padding:2px 0;color:var(--accent);font-weight:700;cursor:pointer;font-size:13px}
+.seg{display:inline-flex;background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{background:transparent;border:0;padding:7px 16px;cursor:pointer;font-weight:700;border-radius:999px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+
+/* Scope */
+.group{margin-bottom:16px;overflow:hidden}
+.group-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.group-head h3{font-size:16px}
+.item{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:6px 14px;align-items:start;padding:14px 20px;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item:hover{background:var(--sunk)}
+.item.on{background:var(--accent-soft)}
+.item input[type=checkbox]{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);cursor:pointer}
+.item-name{font-weight:700;cursor:pointer}
+.item-meta{grid-column:2/4;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);align-items:center}
+.hrs{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.hr{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--field);border-radius:999px;padding:2px 6px 2px 12px;font-weight:700;color:var(--ink)}
+.hr input{width:50px;border:0;background:transparent;font-family:var(--mono);text-align:right;padding:4px 2px}
+.hr input:focus{outline:none}
+.hr:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.hr .u{font-family:var(--mono);color:var(--muted)}
+.hr.edited{border-color:var(--accent-line)}
+.hrs select{border:1px dashed var(--field);border-radius:999px;background:transparent;padding:6px 12px;font-size:13px;color:var(--muted);font-weight:700}
+.edited-tag{font-size:13px;font-weight:700;color:var(--accent);background:var(--surface);border:1px solid var(--accent-line);border-radius:999px;padding:1px 8px;margin-left:4px}
+.bill{font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.bill.monthly{background:color-mix(in srgb,var(--f-mkt) 14%,transparent);color:var(--f-mkt)}
+.qty{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.qty input{width:60px;padding:5px 8px;border:1px solid var(--field);border-radius:999px;background:var(--surface);font-family:var(--mono);text-align:right}
+
+/* Retainer budget */
+.budget{padding:22px;margin-bottom:16px;display:grid;gap:14px}
+.budget-top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;justify-content:space-between}
+.budget h3{font-size:17px}
+.budget p{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:56ch}
+.budget-inputs{display:flex;gap:12px}
+.budget-inputs .field{width:120px}
+.meter{height:10px;background:var(--sunk);border-radius:999px;position:relative;overflow:hidden}
+.meter span{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:999px}
+.meter.over span{background:var(--bad)}
+.meter-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13.5px;margin-top:8px}
+.meter-row .num{font-weight:400}
+.alloc{border:1px solid var(--accent-line);border-radius:var(--r);background:var(--sunk);padding:18px;display:grid;gap:14px}
+.alloc h4{font-size:16px}
+.alloc table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:480px}
+.alloc th{text-align:left;font-weight:700;font-size:13px;color:var(--muted);padding:8px;border-bottom:1px solid var(--line)}
+.alloc td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.alloc td.num,.alloc th.num{text-align:right}
+.alloc .split{color:var(--muted);font-size:13px}
+.alloc .up{color:var(--good)}.alloc .down{color:var(--bad)}
+.alloc-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Rates & terms */
+.row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end}
+.mults{display:grid;grid-template-columns:repeat(3,minmax(0,150px));gap:12px}
+.table-wrap{overflow-x:auto;margin-top:8px}
+table.rates{width:100%;border-collapse:collapse;min-width:560px}
+.rates th{text-align:left;font-weight:700;font-size:13px;color:var(--muted);padding:8px}
+.rates td{padding:6px 8px;border-top:1px solid var(--line)}
+.rates td:first-child{font-weight:700;white-space:nowrap}
+.rates input,.rates select{min-height:40px;padding:8px 10px}
+.rates input{font-family:var(--mono);text-align:right}
+.rates .m{font-family:var(--mono);text-align:right;color:var(--muted);font-size:13px}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:0}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.check{display:flex;gap:10px;align-items:center;min-height:44px;font-weight:700}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+
+/* Estimate (right) */
+.est{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:grid;gap:16px}
+@media (max-width:980px){.est{position:static}}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.sheet-head{padding:18px 20px 6px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sheet-head h2{font-size:17px}
+.big{padding:4px 20px 18px}
+.big .price{font-size:clamp(32px,4vw,40px);font-weight:700;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.big .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kv > div{padding:12px 20px;background:var(--surface)}
+.kv .v{font-size:17px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.good{color:var(--good);background:var(--good-soft)}
+.pill.warn{color:var(--warn);background:var(--warn-soft)}
+.pill.bad{color:var(--bad);background:var(--bad-soft)}
+.mix{padding:16px 20px 18px;border-top:1px solid var(--line)}
+.bar{display:flex;gap:2px;height:10px;border-radius:999px;overflow:hidden;background:var(--sunk);margin:10px 0 12px}
+.bar span{height:100%}
+.legend{display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;font-size:13.5px}
+.legend .num{text-align:right}
+.legend .tot{font-weight:700;border-top:1px solid var(--line);padding-top:6px}
+.empty{padding:22px 20px;color:var(--muted)}
+.est-cta{padding:0 20px 20px}
+.est-cta .btn{width:100%}
+
+/* Review */
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.doc-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.doc-tools h2{font-size:17px}
+pre.summary{margin:0;padding:20px;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:13px;line-height:1.65;max-height:520px;overflow:auto;background:var(--sunk)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:16px 20px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--surface);font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+.toast:empty{display:none}
+@media (max-width:980px){.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+
+/* About */
+.about{margin-top:40px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px}
+@media (max-width:760px){.about{grid-template-columns:minmax(0,1fr)}}
+.about h2{font-size:20px;margin-top:4px}
+.about ol{margin:0;padding-left:20px;display:grid;gap:10px;max-width:70ch;font-size:14.5px}
+.about li::marker{font-weight:700;color:var(--accent)}
+.foot{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+
+/* Mobile price bar */
+.mbar{display:none}
+@media (max-width:980px){.mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(16,26,51,.08)}
+.mbar .num{font-size:20px;font-weight:700;font-family:var(--body)}.mbar a{color:var(--accent);font-weight:700}}
+
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  .top,.stepper,.est,.actions,.doc-tools .seg,.about,.foot,.mbar,.toast,.nav,.step-head,section[role=tabpanel]:not(#pane-review){display:none!important}
+  .grid{display:block;padding:0}.doc{border:0;box-shadow:none}pre.summary{max-height:none;font-size:11pt;color:#000;background:#fff}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">£</div>
+      <div>
+        <h1>Agency Scope Estimator</h1>
+        <p>Scope it, price it and send it in under two minutes.</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="stepper" aria-label="Estimate steps">
+    <ol class="steps" id="steps">
+      <li data-step="details"><button type="button" aria-controls="pane-details"><span>Project info</span><span class="dot"></span></button></li>
+      <li data-step="scope"><button type="button" aria-controls="pane-scope"><span>Scope<span id="scopeCount"></span></span><span class="dot"></span></button></li>
+      <li data-step="rates"><button type="button" aria-controls="pane-rates"><span>Rate card</span><span class="dot"></span></button></li>
+      <li data-step="terms"><button type="button" aria-controls="pane-terms"><span>Terms &amp; buffers</span><span class="dot"></span></button></li>
+      <li data-step="review"><button type="button" aria-controls="pane-review"><span>Review &amp; send</span><span class="dot"></span></button></li>
+    </ol>
+  </nav>
+
+  <div class="grid">
+    <main class="left">
+
+      <section id="pane-details" role="tabpanel" aria-label="Project info">
+        <div class="panel">
+          <div class="step-head">
+            <h2>What type of engagement are you pricing?</h2>
+            <p>Start your estimate by choosing how the client will pay. You can change this at any time.</p>
+          </div>
+          <div class="types" role="radiogroup" aria-label="Engagement type">
+            <label class="type">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 6h16l8 8v28H13z"/><path d="M29 6v8h8"/><path d="M19 22h12M19 28h12M19 34h7"/><circle cx="35" cy="37" r="6" fill="var(--accent-soft)"/><path d="M33 37l1.5 1.5L37.5 35"/></svg>
+              <strong>Fixed-price project</strong>
+              <span>One-off fee for a defined scope, like a website or brand refresh.</span>
+              <input type="radio" name="etype" id="etype-project" value="project">
+            </label>
+            <label class="type">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="10" width="32" height="30" rx="3"/><path d="M8 18h32M16 6v8M32 6v8"/><path d="M16 26h4M24 26h4M16 32h4" /><circle cx="33" cy="33" r="6" fill="var(--accent-soft)"/><path d="M33 30.5V33l1.8 1.2"/></svg>
+              <strong>Monthly retainer</strong>
+              <span>A block of hours each month for SEO, paid media, content or support.</span>
+              <input type="radio" name="etype" id="etype-retainer" value="retainer">
+            </label>
+            <label class="type">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 40h32"/><rect x="11" y="28" width="6" height="12"/><rect x="21" y="22" width="6" height="18"/><rect x="31" y="14" width="6" height="26" fill="var(--accent-soft)"/><path d="M10 20l9-7 7 4 12-9"/><path d="M33 8h5v5"/></svg>
+              <strong>Project + retainer</strong>
+              <span>Build something first, then grow it with ongoing monthly support.</span>
+              <input type="radio" name="etype" id="etype-both" value="both">
+            </label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Who is it for?</h3>
+          <p>These names appear on the client summary.</p>
+          <div class="ref">
+            <label class="field"><span class="label">Client</span><input id="client" autocomplete="off"></label>
+            <label class="field"><span class="label">Project name</span><input id="project" autocomplete="off"></label>
+            <label class="field"><span class="label">Your agency</span><input id="agency" autocomplete="off"></label>
+          </div>
+        </div>
+        <div class="nav"><span></span><button type="button" class="btn primary" data-next="scope">Continue</button></div>
+      </section>
+
+      <section id="pane-scope" role="tabpanel" aria-label="Scope" hidden>
+        <div class="budget" id="budget">
+          <div class="budget-top">
+            <div>
+              <h3>Monthly retainer budget</h3>
+              <p>Set the hours the client is buying each month. Monthly services are measured against it, including PM and contingency.</p>
+            </div>
+            <div class="budget-inputs">
+              <label class="field"><span class="label">Hours / month</span><input id="budgetH" type="number" min="0" max="500" step="1" inputmode="numeric" placeholder="Off"></label>
+              <label class="field"><span class="label">Months</span><input id="months" type="number" min="1" max="36" step="1" inputmode="numeric"></label>
+            </div>
+          </div>
+          <div id="meterBox"></div>
+          <div id="allocBox"></div>
+        </div>
+        <div id="scopeList"></div>
+        <div class="nav"><button type="button" class="btn ghost" data-next="details">Back</button><button type="button" class="btn primary" data-next="rates">Continue</button></div>
+      </section>
+
+      <section id="pane-rates" role="tabpanel" aria-label="Rate card" hidden>
+        <div class="panel">
+          <h3>How rates are entered</h3>
+          <p>Cost is what an hour of that person costs the agency (salary and overheads). Sell is what you charge the client.</p>
+          <div class="row">
+            <div class="field"><span class="label">Rate unit</span>
+              <div class="seg" role="group" aria-label="Rate unit">
+                <button type="button" id="unit-hour" aria-pressed="true">Hourly</button>
+                <button type="button" id="unit-day" aria-pressed="false">Day rate</button>
+              </div>
+            </div>
+            <label class="field" style="width:150px"><span class="label">Hours per day</span><input id="hpd" type="number" min="1" max="12" step="0.5" inputmode="decimal"></label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Seniority multipliers</h3>
+          <p>Applied to both cost and sell rates. Mid level is the base rate.</p>
+          <div class="mults">
+            <label class="field"><span class="label">Junior ×</span><input id="m-junior" type="number" step="0.05" min="0.1" inputmode="decimal"></label>
+            <label class="field"><span class="label">Mid ×</span><input id="m-mid" type="number" step="0.05" min="0.1" inputmode="decimal"></label>
+            <label class="field"><span class="label">Senior ×</span><input id="m-senior" type="number" step="0.05" min="0.1" inputmode="decimal"></label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Rate card</h3>
+          <p>Pick who will do the work, then check the rates. Figures include the seniority multiplier.</p>
+          <div class="table-wrap"><table class="rates" id="rateTable">
+            <thead><tr><th>Discipline</th><th>Level</th><th id="th-cost">Cost £/hr</th><th id="th-sell">Sell £/hr</th><th style="text-align:right">Markup</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+        <div class="nav"><button type="button" class="btn ghost" data-next="scope">Back</button><button type="button" class="btn primary" data-next="terms">Continue</button></div>
+      </section>
+
+      <section id="pane-terms" role="tabpanel" aria-label="Terms and buffers" hidden>
+        <div class="panel">
+          <h3>Timing and buffers</h3>
+          <p>Contingency adds hours for the unknowns. Urgency adds a surcharge to the one-off project fee only.</p>
+          <div class="terms">
+            <label class="field"><span class="label">Urgency</span>
+              <select id="urgency">
+                <option value="standard">Standard timeline (+0%)</option>
+                <option value="priority">Priority (+15%)</option>
+                <option value="rush">Rush (+30%)</option>
+              </select></label>
+            <label class="field"><span class="label">Contingency buffer %</span><input id="contingency" type="number" min="0" max="100" step="1" inputmode="numeric"></label>
+            <label class="field"><span class="label">Project management %</span><input id="pm" type="number" min="0" max="50" step="1" inputmode="numeric"><span class="hint">Added as PM hours on top of delivery</span></label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Pricing</h3>
+          <p>Ad spend is passed through at cost, so it appears on the client summary but not in your margin.</p>
+          <div class="terms">
+            <label class="field"><span class="label">Discount %</span><input id="discount" type="number" min="0" max="50" step="1" inputmode="numeric"></label>
+            <label class="field"><span class="label">Round project fee up to</span>
+              <select id="rounding"><option value="1">No rounding</option><option value="50">Nearest £50</option><option value="100">Nearest £100</option><option value="250">Nearest £250</option><option value="500">Nearest £500</option></select></label>
+            <label class="field"><span class="label">Monthly ad spend £</span><input id="adspend" type="number" min="0" step="100" inputmode="numeric"></label>
+            <label class="field"><span class="label">Target margin %</span><input id="target" type="number" min="0" max="90" step="1" inputmode="numeric"><span class="hint">Amber below this, red 15 points below</span></label>
+            <label class="field"><span class="label">Quote valid for (days)</span><input id="valid" type="number" min="1" max="180" step="1" inputmode="numeric"></label>
+            <label class="check"><input id="vat" type="checkbox"> Show VAT (20%) on summary</label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Saved settings</h3>
+          <p>Your rates and settings are remembered in this browser only.</p>
+          <div class="row">
+            <button type="button" class="btn" id="clearScope">Clear all scope</button>
+            <button type="button" class="btn" id="loadExample">Load example project</button>
+            <button type="button" class="btn" id="resetAll">Reset rates and terms</button>
+          </div>
+        </div>
+        <div class="nav"><button type="button" class="btn ghost" data-next="rates">Back</button><button type="button" class="btn primary" data-next="review">Review estimate</button></div>
+      </section>
+
+      <section id="pane-review" role="tabpanel" aria-label="Review and send" hidden>
+        <div class="doc">
+          <div class="doc-tools">
+            <h2>Client summary</h2>
+            <div class="seg" role="group" aria-label="Summary view">
+              <button type="button" id="view-client" aria-pressed="true">Client</button>
+              <button type="button" id="view-internal" aria-pressed="false">Internal</button>
+            </div>
+          </div>
+          <pre class="summary" id="summary" tabindex="0" aria-label="Summary text"></pre>
+          <div class="actions">
+            <button type="button" class="btn primary" id="copyClient">Copy client summary</button>
+            <button type="button" class="btn" id="copyShort">Copy short message</button>
+            <a class="btn" id="emailLink" href="#">Open as email</a>
+            <button type="button" class="btn" id="printBtn" hidden>Print / save PDF</button>
+            <button type="button" class="btn" id="copyInternal">Copy internal breakdown</button>
+          </div>
+        </div>
+        <div class="nav" style="margin-top:16px"><button type="button" class="btn ghost" data-next="terms">Back</button><span></span></div>
+      </section>
+    </main>
+
+    <aside class="est" id="estimate" aria-label="Estimate">
+      <div class="sheet">
+        <div class="sheet-head"><h2>Estimate</h2><span id="marginPill" class="pill good">Healthy</span></div>
+        <div id="sheetBody"></div>
+        <div class="est-cta"><button type="button" class="btn primary" data-next="review">Review &amp; send</button></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="about" aria-labelledby="aboutTitle">
+    <div>
+      <div class="label">About this prototype</div>
+      <h2 id="aboutTitle">Why it was built with AI, fast</h2>
+    </div>
+    <ol>
+      <li><strong>The problem is real and repeated.</strong> Agencies rebuild the same estimate spreadsheet for every proposal, and margin mistakes only show up after the work is done.</li>
+      <li><strong>The value is in the logic, not the code.</strong> Knowing that ad spend is passed through, that urgency applies to project fees, and that PM time scales with delivery comes from years in agencies. AI turned that knowledge into a working tool in hours instead of weeks.</li>
+      <li><strong>A prototype answers questions a spec can't.</strong> Account managers can try it on a live brief today and say what's missing. That feedback shapes version two before anyone commits budget.</li>
+      <li><strong>Every number was checked by hand.</strong> AI drafted the build; the pricing rules, service list and figures were reviewed and corrected against real agency practice.</li>
+    </ol>
+  </section>
+  <p class="foot">Hours and rates are illustrative defaults for a UK B2B agency. Adjust them to your own rate card before quoting. Figures exclude VAT unless shown.</p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="mbar">
+  <div><div class="label">Total contract value</div><div class="num" id="mbarPrice">£0</div></div>
+  <a href="#estimate">View estimate ↓</a>
+</div>
+
+<script>
+(() => {
+// ---------- Reference data ----------
+const DISC = [
+  {id:'strategy', name:'Strategy',        fam:'strat',  cost:45, sell:110},
+  {id:'pm',       name:'Project management', fam:'strat', cost:35, sell:80},
+  {id:'design',   name:'Design',          fam:'design', cost:38, sell:90},
+  {id:'content',  name:'Content',         fam:'design', cost:32, sell:75},
+  {id:'frontend', name:'Front-end dev',   fam:'eng',    cost:40, sell:95},
+  {id:'backend',  name:'Back-end dev',    fam:'eng',    cost:45, sell:105},
+  {id:'qa',       name:'QA / testing',    fam:'eng',    cost:30, sell:70},
+  {id:'data',     name:'Data & analytics',fam:'eng',    cost:40, sell:95},
+  {id:'seo',      name:'SEO',             fam:'mkt',    cost:35, sell:85},
+  {id:'paid',     name:'Paid media',      fam:'mkt',    cost:35, sell:85},
+  {id:'social',   name:'Social',          fam:'mkt',    cost:28, sell:65},
+];
+const FAM = {strat:'Strategy & PM', design:'Design & content', eng:'Engineering & data', mkt:'Search & media'};
+
+// hours per 1 unit; billing: once | monthly
+const GROUPS = [
+  {name:'Strategy & research', items:[
+    {id:'discovery', name:'Discovery workshop & marketing strategy', b:'once', h:{strategy:16,pm:2}},
+    {id:'personas',  name:'Buyer personas & journey mapping', b:'once', h:{strategy:12,content:4}},
+    {id:'keywords',  name:'Competitor & keyword research', b:'once', h:{seo:10,strategy:4}},
+  ]},
+  {name:'Website (digital experience)', items:[
+    {id:'ux',       name:'Sitemap & UX wireframes', b:'once', h:{design:16,strategy:4}},
+    {id:'webdesign',name:'Bespoke web design', unit:'template', b:'once', h:{design:6}, q:8},
+    {id:'wpbuild',  name:'WordPress build', unit:'template', b:'once', h:{frontend:6,backend:2,qa:1}, q:8},
+    {id:'multi',    name:'Multilingual set-up', unit:'language', b:'once', h:{backend:6,frontend:3,qa:3}, q:1},
+    {id:'migration',name:'SEO website migration', b:'once', h:{seo:20,backend:6,qa:4}},
+    {id:'copy',     name:'Technical website copywriting', unit:'page', b:'once', h:{content:3}, q:10},
+    {id:'hosting',  name:'Hosting, security & support', b:'monthly', h:{backend:2}},
+  ]},
+  {name:'Product features (custom build)', items:[
+    {id:'auth',     name:'User accounts & login', b:'once', h:{backend:24,frontend:12,design:4,qa:8}},
+    {id:'stripe',   name:'Stripe payments', b:'once', h:{backend:20,frontend:10,qa:8}},
+    {id:'admin',    name:'Admin dashboard', b:'once', h:{design:12,frontend:32,backend:24,qa:10}},
+    {id:'analytics',name:'Custom analytics & reporting', b:'once', h:{data:16,backend:10,frontend:6,qa:4}},
+    {id:'api',      name:'API integration (CRM, ERP, HubSpot)', unit:'integration', b:'once', h:{backend:20,qa:6}, q:1},
+  ]},
+  {name:'SEO & AI search', items:[
+    {id:'techaudit',name:'Technical SEO audit', b:'once', h:{seo:16}},
+    {id:'onpage',   name:'Ongoing SEO & on-page optimisation', b:'monthly', h:{seo:8}},
+    {id:'articles', name:'Technical articles', unit:'article', b:'monthly', h:{content:5,seo:1}, q:2},
+    {id:'dpr',      name:'Digital PR', b:'monthly', h:{seo:6,content:4}},
+    {id:'geo',      name:'AI search (GEO) optimisation', b:'monthly', h:{seo:6,content:3}},
+  ]},
+  {name:'Paid media', items:[
+    {id:'ppcsetup', name:'Paid search set-up (Google Ads)', b:'once', h:{paid:12,data:2}},
+    {id:'ppc',      name:'Paid search management', b:'monthly', h:{paid:10}},
+    {id:'lisetup',  name:'Paid social set-up (LinkedIn)', b:'once', h:{paid:10,design:4}},
+    {id:'li',       name:'Paid social management', b:'monthly', h:{paid:8,design:2}},
+  ]},
+  {name:'Content, social & creative', items:[
+    {id:'brand',    name:'Brand refresh & guidelines', b:'once', h:{design:30,strategy:6}},
+    {id:'social',   name:'Organic social (12 posts)', b:'monthly', h:{social:10,design:4}},
+    {id:'email',    name:'Email campaigns', unit:'campaign', b:'monthly', h:{content:3,design:2,data:1}, q:2},
+    {id:'tradeshow',name:'Trade show & sales collateral pack', b:'once', h:{design:20,content:8}},
+  ]},
+  {name:'Data & analytics', items:[
+    {id:'ga4',      name:'GA4 & conversion tracking set-up', b:'once', h:{data:10,frontend:2}},
+    {id:'reporting',name:'Monthly performance reporting', b:'monthly', h:{data:4}},
+  ]},
+];
+const ITEMS = GROUPS.flatMap(g => g.items.map(i => ({...i, group:g.name})));
+const URG = {standard:{label:'Standard timeline', m:1}, priority:{label:'Priority', m:1.15}, rush:{label:'Rush', m:1.30}};
+
+const EXAMPLE = {client:'Example: Hartwell Valves Ltd', project:'Website rebuild + 6-month SEO',
+  sel:{discovery:1, ux:1, webdesign:8, wpbuild:8, copy:10, migration:1, ga4:1, techaudit:1, onpage:1, articles:2, reporting:1, hosting:1}};
+
+const DEFAULTS = () => ({
+  client:EXAMPLE.client, project:EXAMPLE.project, agency:'Your agency name',
+  unit:'hour', hpd:7.5, mult:{junior:0.7, mid:1, senior:1.35},
+  rates:Object.fromEntries(DISC.map(d => [d.id, {level:'mid', cost:d.cost, sell:d.sell}])),
+  sel:{...EXAMPLE.sel}, hours:{}, budget:30,
+  urgency:'standard', contingency:10, pm:10, months:6, discount:0, rounding:250, adspend:0, target:40, vat:true, valid:30,
+  view:'client', tab:'details', etype:'both'
+});
+
+// ---------- State ----------
+const KEY = 'agency-scope-estimator-v1';
+let S = DEFAULTS();
+try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); S = {...S, ...s, mult:{...S.mult, ...(s.mult||{})}, rates:{...S.rates, ...(s.rates||{})}}; } } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+// ---------- Helpers ----------
+const $ = id => document.getElementById(id);
+const gbp = (n, dp=0) => '£' + (Math.round(n * 10**dp) / 10**dp).toLocaleString('en-GB', {minimumFractionDigits:dp, maximumFractionDigits:dp});
+const num = (v, d=0) => { const n = parseFloat(v); return Number.isFinite(n) ? n : d; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtH = h => (Math.round(h * 100) / 100).toLocaleString('en-GB');
+const famColor = f => `var(--f-${f})`;
+const discName = id => DISC.find(d => d.id === id).name;
+const hoursText = h => Object.entries(h).filter(([, v]) => v > 0).map(([k, v]) => `${discName(k)} ${fmtH(v)}h`).join(' · ');
+// Hours for one unit of an item: the user's edited hours if any, otherwise the defaults
+const hrsOf = (S, it) => (S.hours && S.hours[it.id]) || it.h;
+const allowed = (S, it) => !S.etype || S.etype === 'both' || (S.etype === 'project' ? it.b === 'once' : it.b === 'monthly');
+const sumH = h => Object.values(h).reduce((a, b) => a + num(b), 0);
+
+// ---------- Calculation (pure) ----------
+function calc(S) {
+  const mult = l => num(S.mult[l], 1);
+  const rate = id => { const r = S.rates[id]; const m = mult(r.level); return {cost:num(r.cost) * m, sell:num(r.sell) * m}; };
+  const H = {once:{}, monthly:{}};
+  const lines = [];
+  for (const it of ITEMS) {
+    const q = S.sel[it.id]; if (!q || !allowed(S, it)) continue;
+    lines.push({...it, qty:q});
+    for (const [d, h] of Object.entries(hrsOf(S, it))) H[it.b][d] = (H[it.b][d] || 0) + num(h) * q;
+  }
+  const cont = 1 + num(S.contingency) / 100, pmPct = num(S.pm) / 100;
+  const part = (hrs, urgM) => {
+    const base = Object.values(hrs).reduce((a, b) => a + b, 0);
+    if (!base) return {hours:0, cost:0, sell:0, by:{}};
+    const withPm = {...hrs, pm:(hrs.pm || 0) + base * pmPct};
+    const by = {}; let hours = 0, cost = 0, sell = 0;
+    for (const [d, h0] of Object.entries(withPm)) {
+      const h = h0 * cont, r = rate(d);
+      by[d] = {h, cost:h * r.cost, sell:h * r.sell};
+      hours += h; cost += h * r.cost; sell += h * r.sell;
+    }
+    sell = sell * urgM * (1 - num(S.discount) / 100);
+    return {hours, cost, sell, by};
+  };
+  const once = part(H.once, URG[S.urgency].m);
+  const monthly = part(H.monthly, 1);
+  const R = num(S.rounding, 1);
+  const onceFee = once.sell ? Math.ceil(once.sell / R) * R : 0;
+  const monthlyFee = monthly.sell ? Math.ceil(monthly.sell / 50) * 50 : 0;
+  const months = Math.max(1, Math.round(num(S.months, 1)));
+  const price = onceFee + monthlyFee * months;
+  const cost = once.cost + monthly.cost * months;
+  const hours = once.hours + monthly.hours * months;
+  const margin = price ? (price - cost) / price : 0;
+  const by = {};
+  for (const [d, v] of Object.entries(once.by)) by[d] = {h:v.h, cost:v.cost};
+  for (const [d, v] of Object.entries(monthly.by)) { by[d] = by[d] || {h:0, cost:0}; by[d].h += v.h * months; by[d].cost += v.cost * months; }
+  return {lines, once, monthly, onceFee, monthlyFee, months, price, cost, hours, margin, by,
+          blended: hours ? price / hours : 0, profit: price - cost};
+}
+window.__estimatorCalc = calc; // exposed for checking
+
+// Recommended resource allocation (pure): spread the monthly hour budget across the selected
+// monthly services. PM and contingency come out of the budget first, then delivery hours are
+// shared in proportion to each service's standard hours, and split across disciplines the same way.
+function allocate(S) {
+  const B = num(S.budget);
+  const items = ITEMS.filter(it => it.b === 'monthly' && S.sel[it.id] && allowed(S, it));
+  if (!B || !items.length) return null;
+  const pm = num(S.pm) / 100, cont = num(S.contingency) / 100;
+  const delivery = B / ((1 + pm) * (1 + cont));
+  const weights = items.map(it => sumH(it.h) * S.sel[it.id]);
+  const W = weights.reduce((a, b) => a + b, 0);
+  const round = v => Math.round(v * 4) / 4; // quarter hours
+  const rows = items.map((it, i) => {
+    const q = S.sel[it.id], total = delivery * weights[i] / W, base = sumH(it.h);
+    const perUnit = {};
+    for (const [d, h] of Object.entries(it.h)) perUnit[d] = round(total / q * h / base);
+    return {it, q, now:sumH(hrsOf(S, it)) * q, rec:sumH(perUnit) * q, perUnit};
+  });
+  // Quarter-hour rounding leaves a small gap: give it to the largest single-unit service
+  const gap = delivery - rows.reduce((a, r) => a + r.rec, 0);
+  const tgt = rows.filter(r => r.q === 1).sort((a, b) => b.rec - a.rec)[0];
+  if (tgt && Math.abs(gap) >= 0.25) {
+    const d = Object.entries(tgt.perUnit).sort((a, b) => b[1] - a[1])[0][0];
+    tgt.perUnit[d] = Math.max(0, tgt.perUnit[d] + round(gap)); tgt.rec = sumH(tgt.perUnit);
+  }
+  const by = {};
+  rows.forEach(r => { for (const [d, h] of Object.entries(r.perUnit)) by[d] = (by[d] || 0) + h * r.q; });
+  const deliveryRec = rows.reduce((a, r) => a + r.rec, 0);
+  const pmH = deliveryRec * pm, contH = deliveryRec * (1 + pm) * cont;
+  return {B, rows, by, deliveryRec, pmH, contH, total:deliveryRec + pmH + contH};
+}
+window.__estimatorAllocate = allocate;
+
+// ---------- Render: scope ----------
+function renderScope() {
+  $('budget').hidden = S.etype === 'project';
+  $('scopeList').innerHTML = GROUPS.map(g => ({...g, items:g.items.filter(it => allowed(S, it))})).filter(g => g.items.length).map(g => `
+    <div class="group">
+      <div class="group-head"><h3>${esc(g.name)}</h3><span class="label">${g.items.length} options</span></div>
+      ${g.items.map(it => {
+        const q = S.sel[it.id] || 0, on = q > 0, h = hrsOf(S, it), edited = !!(S.hours && S.hours[it.id]);
+        const per = it.unit ? ` per ${it.unit}` : it.b === 'monthly' ? ' per month' : '';
+        const unused = DISC.filter(d => !(d.id in h));
+        return `<div class="item${on ? ' on' : ''}">
+          <input type="checkbox" id="chk-${it.id}" data-id="${it.id}" ${on ? 'checked' : ''}>
+          <label class="item-name" for="chk-${it.id}">${esc(it.name)}${edited ? ' <span class="edited-tag">edited</span>' : ''}</label>
+          <span class="bill ${it.b}">${it.b === 'monthly' ? 'per month' : 'one-off'}</span>
+          ${on ? `<div class="hrs">
+              ${Object.entries(h).map(([d, v]) => `<span class="hr${edited ? ' edited' : ''}"><label for="h-${it.id}-${d}">${esc(discName(d))}</label><input type="number" min="0" step="0.25" id="h-${it.id}-${d}" data-h="${it.id}" data-d="${d}" value="${v}"><span class="u">h</span></span>`).join('')}
+              <span>${per}</span>
+              ${unused.length ? `<select data-add="${it.id}" id="add-${it.id}" aria-label="Add a discipline to ${esc(it.name)}"><option value="">+ discipline</option>${unused.map(d => `<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select>` : ''}
+              ${it.unit ? `<span class="qty">× <input type="number" min="1" max="99" step="1" id="qty-${it.id}" data-qty="${it.id}" value="${q}" aria-label="Number of ${it.unit}s"> ${it.unit}s</span>` : ''}
+              ${edited ? `<button type="button" class="linkbtn" data-reset="${it.id}">Reset hours</button>` : ''}
+            </div>`
+          : `<span class="item-meta"><span class="h">${hoursText(h)}${per}</span></span>`}
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+// Retainer budget meter + recommended allocation
+let allocOpen = false;
+function renderBudget() {
+  const B = num(S.budget), used = R.monthly.hours, monthlyCount = R.lines.filter(l => l.b === 'monthly').length;
+  const box = $('meterBox');
+  if (!B) {
+    box.innerHTML = `<div class="hint">Budget is off. Monthly services are priced from their hours alone.</div>`;
+  } else {
+    const diff = used - B, pct = Math.min(100, used / B * 100);
+    const state = !monthlyCount ? 'Select monthly services below to use this budget.'
+      : Math.abs(diff) < 0.5 ? 'On budget.'
+      : diff > 0 ? `${fmtH(diff)}h over budget.` : `${fmtH(-diff)}h still to allocate.`;
+    box.innerHTML = `
+      <div class="meter${diff > 0.5 ? ' over' : ''}" role="img" aria-label="${fmtH(used)} of ${B} hours used"><span style="width:${pct}%"></span></div>
+      <div class="meter-row"><span><span class="num">${fmtH(used)}h</span> of ${B}h per month used (incl. PM and contingency)</span><span>${state}</span></div>
+      ${monthlyCount ? `<div><button type="button" class="btn go" id="allocBtn" aria-expanded="${allocOpen}">Recommended resource allocation</button></div>` : ''}`;
+    const b = $('allocBtn'); if (b) b.addEventListener('click', () => { allocOpen = !allocOpen; renderBudget(); });
+  }
+  const A = allocOpen ? allocate(S) : null;
+  if (!A) { $('allocBox').innerHTML = ''; return; }
+  const disc = DISC.filter(d => A.by[d.id] || (d.id === 'pm' && A.pmH));
+  const delta = r => { const d = r.rec - r.now; return Math.abs(d) < 0.05 ? '' : `<span class="${d > 0 ? 'up' : 'down'}">${d > 0 ? '+' : ''}${fmtH(d)}</span>`; };
+  $('allocBox').innerHTML = `
+    <div class="alloc">
+      <div><h4>Recommended split of ${A.B}h a month</h4>
+        <div class="hint">${fmtH(A.pmH)}h project management and ${fmtH(A.contH)}h contingency are set aside first. The remaining ${fmtH(A.deliveryRec)}h is shared across services in proportion to their standard effort.</div></div>
+      <div class="table-wrap" style="margin:0"><table>
+        <thead><tr><th>Service</th><th class="num">Now</th><th class="num">Recommended</th><th class="num">Change</th><th>Split</th></tr></thead>
+        <tbody>${A.rows.map(r => `<tr><td>${esc(r.it.name)}${r.q > 1 ? ` <span class="split">× ${r.q}</span>` : ''}</td><td class="num mono">${fmtH(r.now)}h</td><td class="num mono">${fmtH(r.rec)}h</td><td class="num mono">${delta(r)}</td><td class="split">${hoursText(Object.fromEntries(Object.entries(r.perUnit).map(([d, h]) => [d, h * r.q])))}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <div><div class="label" style="margin-bottom:6px">Team hours per month</div>
+        <div class="legend" style="grid-template-columns:1fr auto">${disc.map(d => `<span><span class="swatch" style="background:${famColor(d.fam)}"></span>${esc(d.name)}</span><span class="num">${fmtH((A.by[d.id] || 0) + (d.id === 'pm' ? A.pmH : 0))}h</span>`).join('')}
+          <span>Contingency</span><span class="num">${fmtH(A.contH)}h</span>
+          <span class="tot">Total</span><span class="num tot">${fmtH(A.total)}h</span></div></div>
+      <div class="alloc-actions">
+        <button type="button" class="btn primary" id="applyAlloc" style="grid-column:auto">Apply these hours</button>
+        <button type="button" class="btn" id="closeAlloc">Close</button>
+      </div>
+    </div>`;
+  $('applyAlloc').addEventListener('click', () => {
+    update(() => { S.hours = S.hours || {}; A.rows.forEach(r => { S.hours[r.it.id] = {...r.perUnit}; }); });
+    allocOpen = false; renderScope(); renderBudget(); toast('Recommended hours applied to monthly services.');
+  });
+  $('closeAlloc').addEventListener('click', () => { allocOpen = false; renderBudget(); });
+}
+
+// ---------- Render: rates ----------
+function renderRates() {
+  const day = S.unit === 'day', f = day ? num(S.hpd, 7.5) : 1, u = day ? '£/day' : '£/hr';
+  $('th-cost').textContent = 'Cost ' + u; $('th-sell').textContent = 'Sell ' + u;
+  $('unit-hour').setAttribute('aria-pressed', !day); $('unit-day').setAttribute('aria-pressed', day);
+  $('rateTable').querySelector('tbody').innerHTML = DISC.map(d => {
+    const r = S.rates[d.id], m = num(S.mult[r.level], 1);
+    const c = num(r.cost) * m * f, s = num(r.sell) * m * f;
+    const mk = c ? (s / c - 1) * 100 : 0;
+    return `<tr>
+      <td><span class="swatch" style="background:${famColor(d.fam)}"></span>${esc(d.name)}</td>
+      <td><select id="lvl-${d.id}" data-lvl="${d.id}" aria-label="${esc(d.name)} level">
+        ${['junior','mid','senior'].map(l => `<option value="${l}" ${r.level === l ? 'selected' : ''}>${l[0].toUpperCase() + l.slice(1)}</option>`).join('')}
+      </select></td>
+      <td><input id="cost-${d.id}" data-rate="cost" data-d="${d.id}" type="number" min="0" step="${day ? 10 : 1}" value="${Math.round(c * 100) / 100}" aria-label="${esc(d.name)} cost"></td>
+      <td><input id="sell-${d.id}" data-rate="sell" data-d="${d.id}" type="number" min="0" step="${day ? 10 : 1}" value="${Math.round(s * 100) / 100}" aria-label="${esc(d.name)} sell"></td>
+      <td class="m">${Math.round(mk)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+function syncInputs() {
+  for (const k of ['client','project','agency','hpd','urgency','contingency','pm','months','discount','rounding','adspend','target','valid']) $(k).value = S[k];
+  $('vat').checked = !!S.vat;
+  $('budgetH').value = num(S.budget) || '';
+  const et = $('etype-' + (S.etype || 'both')); if (et) et.checked = true;
+  $('m-junior').value = S.mult.junior; $('m-mid').value = S.mult.mid; $('m-senior').value = S.mult.senior;
+}
+
+// ---------- Render: estimate + summaries ----------
+let R;
+function renderEstimate() {
+  R = calc(S);
+  $('scopeCount').textContent = R.lines.length ? ` (${R.lines.length})` : '';
+  $('mbarPrice').textContent = gbp(R.price);
+  const pill = $('marginPill'), t = num(S.target, 40) / 100;
+  if (!R.price) { pill.className = 'pill warn'; pill.textContent = 'No scope'; }
+  else if (R.margin >= t) { pill.className = 'pill good'; pill.textContent = `Healthy · ${(R.margin * 100).toFixed(1)}%`; }
+  else if (R.margin >= t - 0.15) { pill.className = 'pill warn'; pill.textContent = `Below target · ${(R.margin * 100).toFixed(1)}%`; }
+  else { pill.className = 'pill bad'; pill.textContent = `At risk · ${(R.margin * 100).toFixed(1)}%`; }
+
+  if (!R.lines.length) {
+    $('sheetBody').innerHTML = `<div class="empty">Nothing in scope yet. Tick items on the Scope tab, or load the example project from Terms &amp; buffers.</div>`;
+  } else {
+    const fams = {};
+    for (const [d, v] of Object.entries(R.by)) { const f = DISC.find(x => x.id === d).fam; fams[f] = (fams[f] || 0) + v.h; }
+    const ordered = Object.keys(FAM).filter(f => fams[f]);
+    const urgNote = S.urgency !== 'standard' ? ` incl. ${URG[S.urgency].label.toLowerCase()} surcharge` : '';
+    $('sheetBody').innerHTML = `
+      <div class="big">
+        <div class="label">Total contract value (ex VAT)</div>
+        <div class="price">${gbp(R.price)}</div>
+        <div class="sub">${R.onceFee ? gbp(R.onceFee) + ' project' + urgNote : ''}${R.onceFee && R.monthlyFee ? ' + ' : ''}${R.monthlyFee ? gbp(R.monthlyFee) + '/month × ' + R.months : ''}</div>
+      </div>
+      <div class="kv">
+        <div><div class="label">Total hours</div><div class="v">${fmtH(R.hours)}</div></div>
+        <div><div class="label">Agency cost</div><div class="v">${gbp(R.cost)}</div></div>
+        <div><div class="label">Net profit</div><div class="v">${gbp(R.profit)}</div></div>
+        <div><div class="label">Net margin</div><div class="v">${(R.margin * 100).toFixed(1)}%</div></div>
+        <div><div class="label">Blended rate</div><div class="v">${gbp(R.blended)}/hr</div></div>
+        <div><div class="label">Days of effort</div><div class="v">${fmtH(R.hours / num(S.hpd, 7.5))}</div></div>
+      </div>
+      <div class="mix">
+        <div class="label">Where the hours go</div>
+        <div class="bar" role="img" aria-label="Hours by team">${ordered.map(f => `<span style="width:${fams[f] / R.hours * 100}%;background:${famColor(f)}"></span>`).join('')}</div>
+        <div class="legend">
+          ${ordered.map(f => `<span><span class="swatch" style="background:${famColor(f)}"></span>${FAM[f]}</span><span class="num">${fmtH(fams[f])}h</span><span class="num">${Math.round(fams[f] / R.hours * 100)}%</span>`).join('')}
+        </div>
+      </div>`;
+  }
+  $('summary').textContent = S.view === 'internal' ? internalText() : clientText();
+  $('view-client').setAttribute('aria-pressed', S.view === 'client');
+  $('view-internal').setAttribute('aria-pressed', S.view === 'internal');
+  renderBudget();
+  $('emailLink').href = 'mailto:?subject=' + encodeURIComponent(`Estimate: ${S.project} (${S.client})`) + '&body=' + encodeURIComponent(clientText());
+}
+
+const today = () => new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+function clientText() {
+  if (!R || !R.lines.length) return 'Add scope to generate a client summary.';
+  const L = [];
+  L.push(`ESTIMATE: ${S.project}`, `For: ${S.client}`, `From: ${S.agency}`, `Date: ${today()}`, '');
+  const once = R.lines.filter(l => l.b === 'once'), mon = R.lines.filter(l => l.b === 'monthly');
+  const line = l => `  - ${l.name}${l.unit && l.qty > 1 ? ` (${l.qty} ${l.unit}s)` : l.unit ? ` (1 ${l.unit})` : ''}`;
+  if (once.length) { L.push('PROJECT SCOPE (one-off)'); once.forEach(l => L.push(line(l))); L.push(''); }
+  if (mon.length) { L.push(`ONGOING SERVICES (monthly, ${R.months}-month term)`); mon.forEach(l => L.push(line(l))); L.push(''); }
+  L.push('INVESTMENT (ex VAT)');
+  if (R.onceFee) L.push(`  Project fee:        ${gbp(R.onceFee)}${S.urgency !== 'standard' ? ` (${URG[S.urgency].label.toLowerCase()} delivery)` : ''}`);
+  if (R.monthlyFee) L.push(`  Monthly retainer:   ${gbp(R.monthlyFee)} per month for ${R.months} months${num(S.budget) ? ` (${num(S.budget)} hours a month)` : ''}`);
+  if (num(S.adspend) > 0) L.push(`  Ad spend:           ${gbp(num(S.adspend))} per month, billed at cost`);
+  L.push(`  Total fees:         ${gbp(R.price)}`);
+  if (S.vat) L.push(`  Total incl. VAT:    ${gbp(R.price * 1.2)} (VAT at 20%)`);
+  if (num(S.discount) > 0) L.push(`  Includes a ${num(S.discount)}% discount`);
+  L.push('', 'NOTES',
+    `  - Fixed price for the scope above, including a contingency for minor changes.`,
+    `  - New requirements outside this scope will be quoted separately.`,
+    `  - This estimate is valid for ${num(S.valid, 30)} days from the date above.`);
+  return L.join('\n');
+}
+function shortText() {
+  if (!R || !R.lines.length) return '';
+  const parts = [];
+  if (R.onceFee) parts.push(`${gbp(R.onceFee)} for the project`);
+  if (R.monthlyFee) parts.push(`${gbp(R.monthlyFee)}/month for ${R.months} months`);
+  return `Hi, here's our estimate for ${S.project}: ${parts.join(' plus ')} (ex VAT), ${gbp(R.price)} in total. It covers ${R.lines.length} items of scope; full breakdown to follow. Happy to talk it through.`;
+}
+function internalText() {
+  if (!R || !R.lines.length) return 'Add scope to generate an internal breakdown.';
+  const L = [`INTERNAL: ${S.project} for ${S.client}`, `Prepared ${today()}`, ''];
+  L.push(`Contingency ${num(S.contingency)}% · PM ${num(S.pm)}% · ${URG[S.urgency].label} · Discount ${num(S.discount)}%`, '');
+  L.push('DISCIPLINE              HOURS      COST');
+  for (const d of DISC) { const v = R.by[d.id]; if (!v || !v.h) continue;
+    L.push(`${(d.name + ' (' + S.rates[d.id].level + ')').padEnd(22)} ${fmtH(v.h).padStart(6)}  ${gbp(v.cost).padStart(9)}`); }
+  L.push('', `Total hours:     ${fmtH(R.hours)}`, `Agency cost:     ${gbp(R.cost)}`, `Client price:    ${gbp(R.price)}`,
+    `Net profit:      ${gbp(R.profit)}`, `Net margin:      ${(R.margin * 100).toFixed(1)}% (target ${num(S.target)}%)`, `Blended rate:    ${gbp(R.blended)}/hr`);
+  if (R.onceFee) L.push('', `One-off: fee ${gbp(R.onceFee)}, cost ${gbp(R.once.cost)}, margin ${((1 - R.once.cost / R.onceFee) * 100).toFixed(1)}%`);
+  if (R.monthlyFee) L.push(`Monthly: fee ${gbp(R.monthlyFee)}, cost ${gbp(R.monthly.cost)}, margin ${((1 - R.monthly.cost / R.monthlyFee) * 100).toFixed(1)}%`);
+  if (num(S.budget)) L.push(`Retainer budget: ${num(S.budget)}h/month, ${fmtH(R.monthly.hours)}h allocated`);
+  if (num(S.adspend) > 0) L.push(`Ad spend ${gbp(num(S.adspend))}/month passed through, excluded from margin`);
+  return L.join('\n');
+}
+
+// ---------- Copy ----------
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => t.textContent = '', 2600); }
+function copy(text, label) {
+  if (!text) { toast('Add some scope first.'); return; }
+  const fallback = () => { const pre = $('summary'); pre.textContent = text; const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Copy is blocked here. The text is selected: press Cmd+C or Ctrl+C.'); };
+  try { navigator.clipboard.writeText(text).then(() => toast(label + ' copied.'), fallback); } catch (e) { fallback(); }
+}
+
+// ---------- Events ----------
+function update(fn) { fn(); save(); renderEstimate(); }
+const STEPS = ['details','scope','rates','terms','review'];
+function selectTab(name, scroll) {
+  if (!STEPS.includes(name)) name = 'details';
+  S.tab = name; save();
+  const cur = STEPS.indexOf(name);
+  document.querySelectorAll('#steps li').forEach((li, i) => {
+    li.className = i < cur ? 'done' : i === cur ? 'current' : '';
+    li.querySelector('button').setAttribute('aria-current', i === cur ? 'step' : 'false');
+  });
+  for (const t of STEPS) $('pane-' + t).hidden = t !== name;
+  if (scroll) { try { document.querySelector('.stepper').scrollIntoView({behavior:'smooth', block:'start'}); } catch (e) {} }
+}
+document.querySelectorAll('#steps li').forEach(li => li.querySelector('button').addEventListener('click', () => selectTab(li.dataset.step)));
+document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.next, true)));
+document.querySelectorAll('input[name=etype]').forEach(r => r.addEventListener('change', e => { update(() => { S.etype = e.target.value; if (S.etype === 'project') allocOpen = false; }); renderScope(); }));
+
+const editHours = (id, fn) => { const it = ITEMS.find(i => i.id === id); S.hours = S.hours || {};
+  const h = {...hrsOf(S, it)}; fn(h); S.hours[id] = h; };
+$('scopeList').addEventListener('change', e => {
+  const t = e.target, id = t.dataset.id, qid = t.dataset.qty, add = t.dataset.add;
+  if (id) { const it = ITEMS.find(i => i.id === id);
+    update(() => { if (t.checked) S.sel[id] = it.q || 1; else delete S.sel[id]; });
+    renderScope(); const el = $('chk-' + id); if (el) el.focus(); }
+  if (qid) update(() => { S.sel[qid] = Math.max(1, Math.round(num(t.value, 1))); });
+  if (add && t.value) { const d = t.value; update(() => editHours(add, h => { h[d] = 1; })); renderScope(); const el = $(`h-${add}-${d}`); if (el) { el.focus(); el.select(); } }
+});
+// Mark an item as edited in place, so focus stays where the user is typing
+function markEdited(item, id) {
+  item.querySelectorAll('.hr').forEach(x => x.classList.add('edited'));
+  const name = item.querySelector('.item-name');
+  if (!name.querySelector('.edited-tag')) name.insertAdjacentHTML('beforeend', ' <span class="edited-tag">edited</span>');
+  const hrs = item.querySelector('.hrs');
+  if (!hrs.querySelector('[data-reset]')) hrs.insertAdjacentHTML('beforeend', `<button type="button" class="linkbtn" data-reset="${id}">Reset hours</button>`);
+}
+$('scopeList').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.qty && t.value) update(() => { S.sel[t.dataset.qty] = Math.max(1, Math.round(num(t.value, 1))); });
+  if (t.dataset.h && t.value !== '') { update(() => editHours(t.dataset.h, h => { h[t.dataset.d] = Math.max(0, num(t.value)); })); markEdited(t.closest('.item'), t.dataset.h); }
+});
+$('scopeList').addEventListener('click', e => {
+  const id = e.target.dataset.reset; if (!id) return;
+  update(() => { delete S.hours[id]; }); renderScope(); toast('Hours reset to the standard estimate.');
+});
+$('budgetH').addEventListener('input', e => update(() => { S.budget = Math.max(0, num(e.target.value)); if (!S.budget) allocOpen = false; }));
+
+for (const k of ['client','project','agency']) $(k).addEventListener('input', e => update(() => S[k] = e.target.value));
+for (const k of ['contingency','pm','months','discount','adspend','target','valid']) $(k).addEventListener('input', e => update(() => S[k] = num(e.target.value)));
+for (const k of ['urgency','rounding']) $(k).addEventListener('change', e => update(() => S[k] = e.target.value));
+$('hpd').addEventListener('input', e => update(() => { S.hpd = Math.max(1, num(e.target.value, 7.5)); if (S.unit === 'day') renderRates(); }));
+$('vat').addEventListener('change', e => update(() => S.vat = e.target.checked));
+for (const l of ['junior','mid','senior']) $('m-' + l).addEventListener('input', e => update(() => { S.mult[l] = Math.max(0.1, num(e.target.value, 1)); renderRates(); }));
+$('unit-hour').addEventListener('click', () => update(() => { S.unit = 'hour'; renderRates(); }));
+$('unit-day').addEventListener('click', () => update(() => { S.unit = 'day'; renderRates(); }));
+$('rateTable').addEventListener('change', e => {
+  const lv = e.target.dataset.lvl; if (lv) update(() => { S.rates[lv].level = e.target.value; renderRates(); });
+});
+$('rateTable').addEventListener('input', e => {
+  const t = e.target.dataset.rate, d = e.target.dataset.d; if (!t) return;
+  update(() => { const r = S.rates[d], f = (S.unit === 'day' ? num(S.hpd, 7.5) : 1) * num(S.mult[r.level], 1);
+    r[t] = num(e.target.value) / f; });
+  const r = S.rates[d], cell = e.target.closest('tr').querySelector('.m');
+  cell.textContent = Math.round(r.cost ? (r.sell / r.cost - 1) * 100 : 0) + '%';
+});
+$('view-client').addEventListener('click', () => update(() => S.view = 'client'));
+$('view-internal').addEventListener('click', () => update(() => S.view = 'internal'));
+$('copyClient').addEventListener('click', () => copy(R.lines.length ? clientText() : '', 'Client summary'));
+$('copyShort').addEventListener('click', () => copy(shortText(), 'Short message'));
+$('copyInternal').addEventListener('click', () => copy(R.lines.length ? internalText() : '', 'Internal breakdown'));
+$('emailLink').addEventListener('click', () => toast('Opening your email app. If nothing opens, use Copy client summary instead.'));
+$('clearScope').addEventListener('click', () => { update(() => S.sel = {}); renderScope(); toast('Scope cleared.'); });
+$('loadExample').addEventListener('click', () => { update(() => { S.sel = {...EXAMPLE.sel}; S.client = EXAMPLE.client; S.project = EXAMPLE.project; }); S.etype = 'both'; save(); syncInputs(); renderScope(); renderEstimate(); selectTab('scope', true); });
+$('resetAll').addEventListener('click', () => { const keep = {client:S.client, project:S.project, agency:S.agency, sel:S.sel, hours:S.hours, budget:S.budget}; S = {...DEFAULTS(), ...keep}; save(); syncInputs(); renderRates(); renderEstimate(); toast('Rates and terms reset to defaults.'); });
+
+// Print only works when the page is opened directly (e.g. on your own domain)
+let topLevel = false; try { topLevel = window.self === window.top; } catch (e) {}
+if (topLevel) { const p = $('printBtn'); p.hidden = false; p.addEventListener('click', () => { S.view = 'client'; renderEstimate(); window.print(); }); }
+
+// ---------- Boot ----------
+syncInputs(); renderScope(); renderRates(); selectTab(S.tab || 'details'); renderEstimate();
+})();
+</script>
+</body>
+</html>
